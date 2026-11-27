@@ -45,8 +45,11 @@ export default function StorefrontHomePage() {
     if (inStockOnly) url += `&inStock=true`;
     if (searchQuery) url += `&search=${encodeURIComponent(searchQuery)}`;
 
-    fetch(url)
-      .then((res) => res.json())
+    fetch(url, { cache: 'no-store' })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
         setProducts(Array.isArray(data) ? data : []);
         setLoading(false);

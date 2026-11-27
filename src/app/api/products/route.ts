@@ -27,8 +27,8 @@ export async function GET(req: NextRequest) {
     if (cached) {
       endRequestMetric(cached.isStale ? 200 : 304);
       return cachedJsonResponse(cached.data, cached.etag, ifNoneMatch, {
-        maxAge: 60, // 1 minute edge cache
-        staleWhileRevalidate: 180,
+        maxAge: 0,
+        staleWhileRevalidate: 0,
         customHeaders: rateCheck.headers,
       });
     }
