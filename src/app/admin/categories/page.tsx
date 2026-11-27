@@ -44,7 +44,7 @@ export default function AdminCategoriesPage() {
   const openAddModal = () => {
     setEditingCategory(null);
     setSortOrder(categories.length + 1);
-    setImageUrl('https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80');
+    setImageUrl('');
     setTranslations({
       en: { name: '', description: '', metaTitle: '', metaDescription: '' },
       hi: { name: '', description: '', metaTitle: '', metaDescription: '' },

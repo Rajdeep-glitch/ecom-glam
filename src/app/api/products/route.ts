@@ -150,7 +150,7 @@ export async function GET(req: NextRequest) {
         purityNotes: activeTranslation?.purityNotes || '',
         storageTips: activeTranslation?.storageTips || '',
         media: prod.media,
-        primaryImage: prod.media.find((m) => m.isPrimary)?.url || prod.media[0]?.url || 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80',
+        primaryImage: prod.media.find((m) => m.isPrimary)?.url || prod.media[0]?.url || '/hero-honey.jpg',
         variants: prod.variants,
         translations: prod.translations,
       };

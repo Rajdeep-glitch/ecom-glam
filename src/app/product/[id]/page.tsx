@@ -50,7 +50,7 @@ export default function ProductDetailPage() {
           data?.media?.find((m: any) => m.isPrimary)?.url ||
           data?.media?.[0]?.url ||
           data?.variants?.[0]?.variantImageUrl ||
-          'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80';
+          '/hero-honey.jpg';
         setSelectedImage(firstImg);
         setLoading(false);
       })
@@ -157,7 +157,7 @@ export default function ProductDetailPage() {
           {/* Left Column: Image & Badges */}
           <div className="space-y-4">
             {(() => {
-              const fallbackImg = 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80';
+              const fallbackImg = '/hero-honey.jpg';
               const gallery: { id: string; url: string; altText?: string }[] =
                 product.media && product.media.length > 0
                   ? product.media

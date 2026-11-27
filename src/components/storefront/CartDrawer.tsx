@@ -137,7 +137,7 @@ export default function CartDrawer() {
                   className="flex gap-3.5 p-3.5 rounded-2xl glass-card border border-white/80 hover:border-amber-300 transition-all shadow-sm"
                 >
                   <img
-                    src={item.imageUrl || 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=400&q=80'}
+                    src={item.imageUrl || '/hero-honey.jpg'}
                     alt={item.title}
                     className="w-16 h-16 rounded-xl object-cover border border-amber-200/70 shrink-0"
                   />
