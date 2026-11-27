@@ -27,6 +27,19 @@ const nextConfig = {
     ],
   },
 
+  // Optional Render backend proxy: when BACKEND_URL is set on Vercel,
+  // all /api/* requests are forwarded to the Render backend service.
+  async rewrites() {
+    const backendUrl = process.env.BACKEND_URL?.replace(/\/$/, '');
+    if (!backendUrl) return [];
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${backendUrl}/api/:path*`,
+      },
+    ];
+  },
+
   // HTTP Security Headers for E-Commerce Protection
   async headers() {
     return [
