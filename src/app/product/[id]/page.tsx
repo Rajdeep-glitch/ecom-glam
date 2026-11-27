@@ -12,11 +12,14 @@ import {
   ShoppingBag,
   Check,
   ChevronLeft,
+  ChevronRight,
   Truck,
   Scale,
   Sparkles,
   Droplets,
   Award,
+  ZoomIn,
+  X,
 } from 'lucide-react';
 
 export default function ProductDetailPage() {
@@ -32,14 +35,23 @@ export default function ProductDetailPage() {
   const [selectedWeight, setSelectedWeight] = useState<500 | 1000>(500);
   const [activeTab, setActiveTab] = useState<'desc' | 'floral' | 'purity' | 'storage'>('desc');
   const [added, setAdded] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string>('');
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   useEffect(() => {
     if (!params.id) return;
     setLoading(true);
-    fetch(`/api/products/${params.id}?lang=${lang}`)
+    fetch(`/api/products/${params.id}?lang=${lang}`, { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
         setProduct(data);
+        const firstImg =
+          data?.primaryImage ||
+          data?.media?.find((m: any) => m.isPrimary)?.url ||
+          data?.media?.[0]?.url ||
+          data?.variants?.[0]?.variantImageUrl ||
+          'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80';
+        setSelectedImage(firstImg);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -144,45 +156,154 @@ export default function ProductDetailPage() {
 
           {/* Left Column: Image & Badges */}
           <div className="space-y-4">
-            <div className="relative aspect-square rounded-3xl overflow-hidden bg-gradient-to-b from-stone-100 to-amber-50/50 border border-amber-200/60 shadow-inner group">
-              <img
-                src={activeVariant?.variantImageUrl || product.primaryImage}
-                alt={product.title}
-                className="w-full h-full object-cover group-hover:scale-104 transition-transform duration-700 ease-out"
-              />
+            {(() => {
+              const fallbackImg = 'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80';
+              const gallery: { id: string; url: string; altText?: string }[] =
+                product.media && product.media.length > 0
+                  ? product.media
+                  : [{ id: 'primary', url: activeVariant?.variantImageUrl || product.primaryImage || fallbackImg, altText: product.title }];
+              const displayedImage = selectedImage || gallery[0]?.url || fallbackImg;
+              const currentIdx = Math.max(0, gallery.findIndex((m) => m.url === displayedImage));
+              const showPrev = () => setSelectedImage(gallery[(currentIdx - 1 + gallery.length) % gallery.length].url);
+              const showNext = () => setSelectedImage(gallery[(currentIdx + 1) % gallery.length].url);
 
-              {savingsPercent > 0 && (
-                <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-600 to-yellow-500 text-white font-black text-xs px-3.5 py-1.5 rounded-full shadow-lg shadow-amber-900/30 uppercase tracking-wider">
-                  SAVE {savingsPercent}%
-                </div>
-              )}
+              return (
+                <>
+                  <div className="relative aspect-square rounded-3xl overflow-hidden bg-gradient-to-b from-stone-100 to-amber-50/50 border border-amber-200/60 shadow-inner group">
+                    <img
+                      src={displayedImage}
+                      alt={product.title}
+                      onClick={() => setIsLightboxOpen(true)}
+                      className="w-full h-full object-cover cursor-zoom-in group-hover:scale-105 transition-transform duration-700 ease-out"
+                    />
 
-              {isFragile && (
-                <div className="absolute top-4 right-4 bg-amber-950/80 backdrop-blur-md text-amber-200 font-bold text-xs px-3.5 py-1.5 rounded-full flex items-center gap-2 shadow-lg border border-amber-500/30">
-                  <ShieldAlert className="w-4 h-4 text-amber-400" />
-                  <span>Fragile Glass Jar</span>
-                </div>
-              )}
+                    <button
+                      type="button"
+                      onClick={() => setIsLightboxOpen(true)}
+                      aria-label="Open full-size image"
+                      className="absolute bottom-4 right-4 z-10 p-2.5 rounded-full bg-white/90 hover:bg-white text-amber-950 shadow-md border border-amber-200/80 transition-all"
+                    >
+                      <ZoomIn className="w-4 h-4" />
+                    </button>
 
-              <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md text-xs px-3.5 py-1.5 rounded-xl text-stone-800 font-mono font-bold shadow-md border border-white/80 flex items-center gap-1.5">
-                <Scale className="w-3.5 h-3.5 text-stone-500" />
-                <span>Tare Gross: {grossWeight}g</span>
-              </div>
-            </div>
+                    {gallery.length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={showPrev}
+                          aria-label="Previous image"
+                          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/85 hover:bg-white text-amber-950 shadow-md border border-amber-200/80 transition-all"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={showNext}
+                          aria-label="Next image"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white/85 hover:bg-white text-amber-950 shadow-md border border-amber-200/80 transition-all"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
 
-            {/* Gallery Thumbnails */}
-            {product.media && product.media.length > 1 && (
-              <div className="flex gap-2.5 overflow-x-auto pb-1">
-                {product.media.map((m: any) => (
-                  <img
-                    key={m.id}
-                    src={m.url}
-                    alt={m.altText || product.title}
-                    className="w-16 h-16 rounded-2xl object-cover border border-amber-200 cursor-pointer hover:opacity-80 transition-opacity shadow-xs"
-                  />
-                ))}
-              </div>
-            )}
+                    {savingsPercent > 0 && (
+                      <div className="absolute top-4 left-4 bg-gradient-to-r from-amber-600 to-yellow-500 text-white font-black text-xs px-3.5 py-1.5 rounded-full shadow-lg shadow-amber-900/30 uppercase tracking-wider">
+                        SAVE {savingsPercent}%
+                      </div>
+                    )}
+
+                    {isFragile && (
+                      <div className="absolute top-4 right-4 bg-amber-950/80 backdrop-blur-md text-amber-200 font-bold text-xs px-3.5 py-1.5 rounded-full flex items-center gap-2 shadow-lg border border-amber-500/30">
+                        <ShieldAlert className="w-4 h-4 text-amber-400" />
+                        <span>Fragile Glass Jar</span>
+                      </div>
+                    )}
+
+                    <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md text-xs px-3.5 py-1.5 rounded-xl text-stone-800 font-mono font-bold shadow-md border border-white/80 flex items-center gap-1.5">
+                      <Scale className="w-3.5 h-3.5 text-stone-500" />
+                      <span>Tare Gross: {grossWeight}g</span>
+                    </div>
+                  </div>
+
+                  {/* Gallery Thumbnails */}
+                  {gallery.length > 1 && (
+                    <div className="flex gap-2.5 overflow-x-auto pb-1">
+                      {gallery.map((m) => {
+                        const isSelected = m.url === displayedImage;
+                        return (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => setSelectedImage(m.url)}
+                            className={`shrink-0 rounded-2xl overflow-hidden border-2 transition-all shadow-xs ${
+                              isSelected
+                                ? 'border-amber-600 ring-2 ring-amber-400/70 scale-105'
+                                : 'border-amber-200 hover:border-amber-400 opacity-80 hover:opacity-100'
+                            }`}
+                          >
+                            <img
+                              src={m.url}
+                              alt={m.altText || product.title}
+                              className="w-16 h-16 object-cover"
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Full-screen Lightbox Modal */}
+                  {isLightboxOpen && (
+                    <div
+                      onClick={() => setIsLightboxOpen(false)}
+                      className="fixed inset-0 z-50 bg-stone-950/90 backdrop-blur-md flex items-center justify-center p-4"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setIsLightboxOpen(false)}
+                        aria-label="Close image preview"
+                        className="absolute top-5 right-5 p-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors"
+                      >
+                        <X className="w-6 h-6" />
+                      </button>
+                      {gallery.length > 1 && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              showPrev();
+                            }}
+                            aria-label="Previous image"
+                            className="absolute left-4 sm:left-8 p-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors"
+                          >
+                            <ChevronLeft className="w-6 h-6" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              showNext();
+                            }}
+                            aria-label="Next image"
+                            className="absolute right-4 sm:right-8 p-3 rounded-full bg-white/15 hover:bg-white/25 text-white transition-colors"
+                          >
+                            <ChevronRight className="w-6 h-6" />
+                          </button>
+                        </>
+                      )}
+                      <img
+                        src={displayedImage}
+                        alt={product.title}
+                        onClick={(e) => e.stopPropagation()}
+                        className="max-h-[88vh] max-w-[92vw] object-contain rounded-2xl shadow-2xl"
+                      />
+                    </div>
+                  )}
+                </>
+              );
+            })()}
           </div>
 
           {/* Right Column: Title, Variant Matrix, Pricing, CTAs */}

@@ -54,15 +54,15 @@ export async function GET(req: NextRequest) {
       whereClause.isFeatured = true;
     }
 
-    // Search filter across titles, summaries, and descriptions
+    // Search filter across titles, summaries, and descriptions (case-insensitive for Postgres)
     if (search) {
       whereClause.translations = {
         some: {
           OR: [
-            { title: { contains: search } },
-            { summary: { contains: search } },
-            { description: { contains: search } },
-            { floralOrigin: { contains: search } },
+            { title: { contains: search, mode: 'insensitive' } },
+            { summary: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+            { floralOrigin: { contains: search, mode: 'insensitive' } },
           ],
         },
       };
@@ -159,8 +159,8 @@ export async function GET(req: NextRequest) {
     const etag = cacheManager.set(cacheKey, localizedProducts, 60, ['products']);
     endRequestMetric(200);
     return cachedJsonResponse(localizedProducts, etag, ifNoneMatch, {
-      maxAge: 60,
-      staleWhileRevalidate: 180,
+      maxAge: 0,
+      staleWhileRevalidate: 0,
       customHeaders: rateCheck.headers,
     });
   } catch (error) {

@@ -32,8 +32,16 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const fallback = product.translations.find((t) => t.langCode === 'en') || product.translations[0];
     const activeTranslation = match || fallback;
 
+    const catMatch = product.category?.translations?.find((t) => t.langCode === lang);
+    const catFallback = product.category?.translations?.find((t) => t.langCode === 'en') || product.category?.translations?.[0];
+
     return NextResponse.json({
       ...product,
+      categoryName: catMatch?.name || catFallback?.name || 'Honey Variety',
+      primaryImage:
+        product.media.find((m) => m.isPrimary)?.url ||
+        product.media[0]?.url ||
+        'https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=800&q=80',
       title: activeTranslation?.title || 'Artisanal Honey',
       slug: activeTranslation?.slug || product.id,
       summary: activeTranslation?.summary || '',
