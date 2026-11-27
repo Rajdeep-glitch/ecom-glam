@@ -1,0 +1,317 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Language {
+  code        String   @id // en, hi, bn, ar
+  name        String   // English, हिन्दी, বাংলা, العربية
+  nativeName  String   // English, हिन्दी, বাংলা, العربية
+  direction   String   @default("ltr") // ltr or rtl
+  isDefault   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryTranslations CategoryTranslation[]
+  productTranslations  ProductTranslation[]
+  uiTranslations       UiTranslation[]
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  parentId    String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parent       Category?             @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children     Category[]            @relation("CategoryHierarchy")
+  translations CategoryTranslation[]
+  products     Product[]
+
+  @@index([isActive, sortOrder])
+  @@index([parentId])
+}
+
+model CategoryTranslation {
+  id              String   @id @default(cuid())
+  categoryId      String
+  langCode        String
+  name            String
+  slug            String
+  description     String?
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  language Language @relation(fields: [langCode], references: [code], onDelete: Cascade)
+
+  @@unique([categoryId, langCode])
+  @@index([langCode, slug])
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  categoryId  String
+  isFeatured  Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  hsnCode     String   @default("04090000") // 04090000 is Natural Honey HSN code
+  taxRate     Float    @default(5.0)       // 5% GST for packaged natural honey
+  basePrice   Float    @default(0.0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category     Category             @relation(fields: [categoryId], references: [id])
+  translations ProductTranslation[]
+  variants     ProductVariant[]
+  media        ProductMedia[]
+
+  @@index([categoryId, isActive])
+  @@index([isActive, isFeatured])
+  @@index([createdAt])
+}
+
+model ProductTranslation {
+  id           String   @id @default(cuid())
+  productId    String
+  langCode     String
+  title        String
+  slug         String
+  summary      String?
+  description  String
+  floralOrigin String?
+  purityNotes  String?
+  storageTips  String?
+  seoKeywords  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  language Language @relation(fields: [langCode], references: [code], onDelete: Cascade)
+
+  @@unique([productId, langCode])
+  @@index([langCode, slug])
+  @@index([productId])
+}
+
+model ProductVariant {
+  id                      String   @id @default(cuid())
+  productId               String
+  packagingType           String   // "GLASS_JAR" or "PET_JAR"
+  netWeightGrams          Int      // 500 or 1000
+  grossShippingWeightGrams Int     // 820 for 500g glass, 1480 for 1kg glass, 555 for 500g pet, 1085 for 1kg pet
+  isFragile               Boolean  @default(false) // true for glass jar
+  sku                     String   @unique
+  mrp                     Float
+  salePrice               Float
+  stockQuantity           Int      @default(50)
+  variantImageUrl         String?
+  isActive                Boolean  @default(true)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@index([productId, isActive])
+  @@index([packagingType, netWeightGrams])
+  @@index([stockQuantity])
+  @@index([salePrice])
+}
+
+model ProductMedia {
+  id          String   @id @default(cuid())
+  productId   String
+  variantId   String?
+  url         String
+  altText     String?
+  sortOrder   Int      @default(0)
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, sortOrder])
+  @@index([variantId])
+}
+
+model UiTranslation {
+  id        String   @id @default(cuid())
+  key       String   // e.g. "nav.home", "btn.add_to_cart"
+  group     String   @default("common") // common, nav, catalog, cart, checkout, admin
+  langCode  String   // en, hi, bn, ar
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  language Language @relation(fields: [langCode], references: [code], onDelete: Cascade)
+
+  @@unique([key, langCode])
+  @@index([langCode, group])
+  @@index([langCode])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("CUSTOMER") // SUPER_ADMIN, OPERATIONS_STAFF, CUSTOMER
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders    Order[]
+  addresses Address[]
+
+  @@index([role])
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String?
+  fullName   String
+  phone      String
+  street     String
+  city       String
+  state      String
+  postalCode String
+  country    String   @default("India")
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Order {
+  id                    String   @id @default(cuid())
+  orderNumber           String   @unique // e.g. ORD-2026-1001
+  userId                String?
+  customerName          String
+  customerEmail         String
+  customerPhone         String
+  shippingAddress       String
+  billingAddress        String?
+  totalGrossWeightGrams Int
+  hasGlassPackaging     Boolean  @default(false)
+  subtotal              Float
+  taxAmount             Float
+  shippingFee           Float
+  totalAmount           Float
+  paymentMethod         String   @default("ONLINE_UPI_CARD") // ONLINE_UPI_CARD, COD
+  paymentStatus         String   @default("PAID") // PENDING, PAID, FAILED, REFUNDED
+  paymentTransactionId  String?
+  status                String   @default("CONFIRMED") // PENDING, CONFIRMED, PACKED, SHIPPED, DELIVERED, CANCELLED, RETURNED
+  notes                 String?
+  idempotencyKey        String?  @unique
+  guestAccessToken      String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user          User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items         OrderItem[]
+  invoice       Invoice?
+  shippingLabel ShippingLabel?
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id               String  @id @default(cuid())
+  orderId          String
+  variantId        String?
+  productTitle     String
+  variantTitle     String
+  packagingType    String  // GLASS_JAR or PET_JAR
+  netWeightGrams   Int
+  grossWeightGrams Int
+  sku              String
+  unitPrice        Float
+  quantity         Int
+  totalPrice       Float
+
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([variantId])
+  @@index([sku])
+}
+
+model Invoice {
+  id                 String   @id @default(cuid())
+  orderId            String   @unique
+  invoiceNumber      String   @unique // e.g. INV-2026-0001
+  hsnSummary         String?  @default("04090000 - Natural Honey (5% GST)")
+  taxBreakupJson     String?  // JSON string containing CGST, SGST, IGST
+  sellerGstNumber    String   @default("07AAAAA0000A1Z5")
+  sellerCompanyName  String   @default("Artisanal Royal Honey Co. Ltd.")
+  sellerAddress      String   @default("Suite 104, Apiary Heights, Western Ghats Reserve, Karnataka 577101")
+  pdfUrl             String?
+  generatedAt        DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([generatedAt])
+}
+
+model ShippingLabel {
+  id                   String   @id @default(cuid())
+  orderId              String   @unique
+  trackingNumber       String   @unique // e.g. AWB-9821873912
+  courierPartner       String   @default("HoneyExpress Courier & Logistics")
+  barcodeData          String   // Barcode content (e.g. AWB-9821873912)
+  qrCodeData           String   // QR payload
+  totalWeightGrams     Int
+  isFragileGlass       Boolean  @default(false)
+  handlingInstructions String   @default("STANDARD HANDLING")
+  labelFormat          String   @default("4x6_THERMAL") // 4x6_THERMAL, A4_SHEET
+  generatedAt          DateTime @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([generatedAt])
+}
+
+model OrderSequence {
+  id            String @id @default("order_seq")
+  currentNumber Int    @default(1000)
+}
+
+model StoredFile {
+  id        String   @id @default(cuid())
+  filename  String
+  mimeType  String
+  size      Int
+  data      Bytes
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model CartSession {
+  id               String   @id
+  lang             String   @default("en")
+  deliveryLocation String   @default("")
+  itemsJson        String   @default("[]")
+  updatedAt        DateTime @updatedAt
+  createdAt        DateTime @default(now())
+}
+

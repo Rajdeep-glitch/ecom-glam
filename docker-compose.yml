@@ -1,0 +1,78 @@
+version: '3.8'
+
+# Horizontally Scaled Production Cluster with Nginx Load Balancer
+services:
+  # Upstream Nginx Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: ecom_load_balancer
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web-1
+      - web-2
+      - web-3
+    networks:
+      - ecom_network
+
+  # Web Worker Instance 1
+  web-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecom_web_1
+    restart: always
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+    networks:
+      - ecom_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Web Worker Instance 2
+  web-2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecom_web_2
+    restart: always
+    environment:
+      - PORT=3001
+      - NODE_ENV=production
+    networks:
+      - ecom_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Web Worker Instance 3
+  web-3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecom_web_3
+    restart: always
+    environment:
+      - PORT=3002
+      - NODE_ENV=production
+    networks:
+      - ecom_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3002/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+networks:
+  ecom_network:
+    driver: bridge
