@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -12,7 +13,8 @@ import {
   ExternalLink,
   ShieldCheck,
   LogOut,
-  Sparkles,
+  Menu,
+  X,
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -26,6 +28,7 @@ const NAV_ITEMS = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = async () => {
     await fetch('/api/auth/me', { method: 'POST' });
@@ -33,7 +36,40 @@ export default function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 bg-stone-950/90 text-amber-50 flex flex-col min-h-screen border-r border-amber-500/20 shadow-2xl backdrop-blur-2xl shrink-0 z-30">
+    <>
+      {/* Mobile Top Bar */}
+      <div className="lg:hidden bg-stone-950 text-amber-50 px-4 py-3 flex items-center justify-between border-b border-amber-500/20 sticky top-0 z-40">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-400 flex items-center justify-center text-base">
+            🍯
+          </div>
+          <span className="font-serif font-black text-sm tracking-wide text-amber-200">
+            SELLER CENTRAL
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle admin menu"
+          className="p-2 rounded-xl text-amber-200 hover:bg-white/10"
+        >
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+
+      {/* Mobile Backdrop */}
+      {mobileOpen && (
+        <div
+          onClick={() => setMobileOpen(false)}
+          className="lg:hidden fixed inset-0 bg-black/50 backdrop-blur-xs z-40"
+        />
+      )}
+
+      <aside
+        className={`${
+          mobileOpen ? 'fixed inset-y-0 left-0 flex z-50' : 'hidden lg:flex'
+        } w-64 bg-stone-950/95 text-amber-50 flex-col min-h-screen border-r border-amber-500/20 shadow-2xl backdrop-blur-2xl shrink-0`}
+      >
       {/* Brand Header */}
       <div className="p-5 border-b border-amber-500/20 bg-amber-950/30">
         <div className="flex items-center gap-3">
@@ -113,5 +149,6 @@ export default function AdminSidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }

@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-stone-50 text-stone-900 font-sans antialiased selection:bg-amber-200 selection:text-amber-950">
+      <body className="min-h-screen bg-stone-50 text-stone-900 font-sans antialiased overflow-x-hidden selection:bg-amber-200 selection:text-amber-950">
         <StoreProvider>
           {children}
           <CartDrawer />

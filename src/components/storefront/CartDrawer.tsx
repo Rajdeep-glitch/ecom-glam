@@ -52,8 +52,8 @@ export default function CartDrawer() {
         className="absolute inset-0 bg-stone-950/40 backdrop-blur-md transition-opacity duration-300"
       />
 
-      <div className={`fixed inset-y-0 ${direction === 'rtl' ? 'left-0' : 'right-0'} max-w-full flex pl-6 sm:pl-10`}>
-        <div className="w-screen max-w-md bg-white/90 backdrop-blur-2xl border-l border-white/80 shadow-2xl flex flex-col">
+      <div className={`fixed inset-y-0 ${direction === 'rtl' ? 'left-0' : 'right-0'} max-w-full flex pl-4 sm:pl-10`}>
+        <div className="w-[calc(100vw-1rem)] sm:w-screen max-w-md bg-white/90 backdrop-blur-2xl border-l border-white/80 shadow-2xl flex flex-col">
           {/* Header */}
           <div className="p-5 border-b border-amber-200/60 bg-gradient-to-r from-amber-50/80 to-white/60 flex items-center justify-between">
             <div className="flex items-center gap-3">

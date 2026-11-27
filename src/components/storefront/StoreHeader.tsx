@@ -50,20 +50,20 @@ export default function StoreHeader({ onSearch }: { onSearch?: (q: string) => vo
       </div>
 
       {/* Main Floating Glassmorphic Navbar */}
-      <nav className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl glass-card border border-white/80 shadow-xl shadow-amber-950/5 px-4 sm:px-6 h-20 flex items-center justify-between gap-3 sm:gap-6">
+      <nav className="max-w-7xl mx-auto rounded-2xl sm:rounded-3xl glass-card border border-white/80 shadow-xl shadow-amber-950/5 px-3 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-6">
         {/* Brand Logo with Glowing Aura */}
-        <Link href="/" className="flex items-center gap-3 shrink-0 group">
-          <div className="relative">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-400 flex items-center justify-center text-2xl shadow-lg shadow-amber-600/30 group-hover:scale-105 transition-transform duration-300">
+        <Link href="/" className="flex items-center gap-2 sm:gap-3 min-w-0 group">
+          <div className="relative shrink-0">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-amber-600 via-amber-500 to-yellow-400 flex items-center justify-center text-lg sm:text-2xl shadow-lg shadow-amber-600/30 group-hover:scale-105 transition-transform duration-300">
               🍯
             </div>
             <div className="absolute inset-0 rounded-2xl bg-amber-400/30 blur-md -z-10 group-hover:bg-amber-400/50 transition-all" />
           </div>
-          <div>
-            <span className="font-serif font-black text-xl sm:text-2xl tracking-tight text-amber-950 block leading-tight">
+          <div className="min-w-0">
+            <span className="font-serif font-black text-base sm:text-2xl tracking-tight text-amber-950 block leading-tight truncate">
               {t('nav.store_name', 'Royal Nectar Apiaries')}
             </span>
-            <span className="text-[10px] tracking-widest uppercase font-semibold text-amber-700/90 block">
+            <span className="hidden sm:block text-[10px] tracking-widest uppercase font-semibold text-amber-700/90">
               Direct Artisanal Honey Harvest
             </span>
           </div>

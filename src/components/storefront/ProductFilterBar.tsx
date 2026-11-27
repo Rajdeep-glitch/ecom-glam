@@ -65,7 +65,7 @@ export default function ProductFilterBar({
 
       {/* Dropdown Filter Panel */}
       {isOpen && (
-        <div className="absolute right-0 mt-2.5 w-80 z-40 rounded-3xl bg-white/95 backdrop-blur-2xl border border-amber-200/80 p-5 shadow-2xl shadow-amber-950/15 space-y-5">
+        <div className="absolute right-0 mt-2.5 w-[calc(100vw-2rem)] sm:w-80 max-w-sm z-40 rounded-3xl bg-white/95 backdrop-blur-2xl border border-amber-200/80 p-4 sm:p-5 shadow-2xl shadow-amber-950/15 space-y-5">
           <div className="flex items-center justify-between border-b border-amber-100 pb-3">
             <h4 className="font-serif font-bold text-xs uppercase tracking-wider text-amber-950 flex items-center gap-2">
               <SlidersHorizontal className="w-3.5 h-3.5 text-amber-600" />

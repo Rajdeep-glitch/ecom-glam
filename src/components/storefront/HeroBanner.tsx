@@ -49,10 +49,10 @@ export default function HeroBanner({ onExploreClick }: { onExploreClick?: () => 
             </p>
 
             {/* Glowing CTA Buttons */}
-            <div className="flex flex-wrap gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-2">
               <button
                 onClick={onExploreClick}
-                className="px-7 py-3.5 rounded-full bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-amber-950 font-black text-xs sm:text-sm flex items-center gap-2.5 shadow-xl shadow-amber-600/30 transition-all hover:scale-103 shimmer-button"
+                className="w-full sm:w-auto justify-center px-7 py-3.5 rounded-full bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-amber-950 font-black text-xs sm:text-sm flex items-center gap-2.5 shadow-xl shadow-amber-600/30 transition-all hover:scale-103 shimmer-button"
               >
                 <span>{t('hero.cta_shop', 'Browse Varieties')}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -60,7 +60,7 @@ export default function HeroBanner({ onExploreClick }: { onExploreClick?: () => 
 
               <a
                 href="#purity-guarantee"
-                className="px-6 py-3.5 rounded-full glass-card-dark text-amber-100 hover:text-white hover:bg-amber-900/60 font-semibold text-xs sm:text-sm flex items-center gap-2 border border-amber-500/30 transition-all"
+                className="w-full sm:w-auto justify-center px-6 py-3.5 rounded-full glass-card-dark text-amber-100 hover:text-white hover:bg-amber-900/60 font-semibold text-xs sm:text-sm flex items-center gap-2 border border-amber-500/30 transition-all"
               >
                 <Award className="w-4 h-4 text-amber-400" />
                 <span>{t('hero.cta_purity', 'View NMR Lab Reports')}</span>
@@ -68,7 +68,7 @@ export default function HeroBanner({ onExploreClick }: { onExploreClick?: () => 
             </div>
 
             {/* Micro Pillars */}
-            <div className="pt-6 border-t border-amber-800/40 grid grid-cols-3 gap-3 text-[11px] text-amber-200/90 font-medium">
+            <div className="pt-6 border-t border-amber-800/40 grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 text-[11px] text-amber-200/90 font-medium">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span>Zero Sugar Syrups</span>
